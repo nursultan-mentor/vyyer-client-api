@@ -3,10 +3,10 @@ from django.db import models
 
 class Identity(models.Model):
     id = models.IntegerField(primary_key=True)
-    uid = models.UUIDField(editable=False, unique=True)
+    uid = models.CharField(max_length=50, unique=True)
     fullname = models.CharField(max_length=50)
-    issued_at = models.DateField()
-    expires_at = models.DateField()
+    issued_at = models.DateField(null=True)
+    expires_at = models.DateField(null=True)
 
     class Meta:
         db_table = 'identities'
@@ -20,6 +20,7 @@ class Identity(models.Model):
 
 class Scan(models.Model):
     id = models.IntegerField(primary_key=True)
+    identity = models.ForeignKey(Identity, on_delete=models.CASCADE)
     user_id = models.CharField(max_length=50)
     created_at = models.DateTimeField()
     flags = models.SmallIntegerField()
