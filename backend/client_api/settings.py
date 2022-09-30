@@ -20,8 +20,76 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&&5xn*1yzo!r*++orjikzd=($ip7*=et@3!ip3494n*0_lt+f*'
-# SECRET_KEY = os.environ.get('SECRET_KEY')
+
+SECRET_KEY = os.environ.get('SECRET_KEY') if os.environ.get('SECRET_KEY') else 'foo'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+
+DEBUG = os.environ.get('DEBUG') if os.environ.get('DEBUG') else True
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS') if os.environ.get('ALLOWED_HOSTS') else ['*']
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'drf_yasg',
+    'corsheaders',
+    'scan_identity',
+    'scan_identity.audit',
+    'scan_identity.audit.models',
+    'scan_identity.audit.serializers',
+    'scan_identity.audit.views',
+    'scan_identity.audit.mixins',
+    'scan_identity.audit.filters',
+    'scan_identity.audit.admin',
+    'scan_identity.audit.audience',
+    'scan_identity.audit.tests',
+    'scan_identity.audit.urls',
+    'scan_identity.audit.utils',
+    'scan_identity.audit.exceptions',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+]
+
+ROOT_URLCONF = 'client_api.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'client_api.wsgi.application'
+
+# Database
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', True)
