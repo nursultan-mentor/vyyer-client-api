@@ -22,7 +22,6 @@ class Scan(models.Model):
     id = models.IntegerField(primary_key=True)
     identity = models.ForeignKey(Identity, on_delete=models.CASCADE)
     user_id = models.CharField(max_length=50)
-    created_at = models.DateTimeField()
     flags = models.SmallIntegerField()
     verdict_type = models.SmallIntegerField()
     verdict_result = models.SmallIntegerField()
@@ -31,7 +30,7 @@ class Scan(models.Model):
 
     class Meta:
         db_table = 'scans'
-        ordering = ['-created_at']
+        ordering = ['id', ]
         verbose_name = 'Scan'
         verbose_name_plural = 'Scans'
 
