@@ -4,6 +4,8 @@ from itertools import chain
 import aiohttp
 from asgiref.sync import sync_to_async
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
@@ -36,7 +38,7 @@ async def generate_data(request):
     async with aiohttp.ClientSession() as session:
         scan_url = '/api/v2/scans/get/'
         identity_url = '/api/v2/identities/get/'
-        tasks = (get_data(session, headers, dict(Page=c, PerPage=25), scan_url) for c in range(1, 100))
+        tasks = (get_data(session, headers, dict(Page=c, PerPage=5000), scan_url) for c in range(1, 14))
         result = await asyncio.gather(*tasks)
 
         all_data = tuple(chain(res['Data'] for res in result))
@@ -44,8 +46,8 @@ async def generate_data(request):
         identity_ids = list({i.get('IdentityID') for i in all_data if i.get('IdentityID')})
 
         identity_tasks = []
-        for i in range(0, len(identity_ids), 100):
-            j = i + 100
+        for i in range(0, len(identity_ids), 25):
+            j = i + 25
             identity_tasks.append(get_data(session, headers, dict(IdentityIDs=identity_ids[i:j]), identity_url))
         identity_tasks.append(get_data(session, headers, dict(IdentityIDs=identity_ids[j:]), identity_url))
         identity_result = await asyncio.gather(*identity_tasks)
@@ -73,6 +75,7 @@ async def generate_data(request):
         return HttpResponse('Data generated')
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Identity GetList']))
 class IdentityListAPIView(ListAPIView):
     """Get list of identities"""
     queryset = Identity.objects.all()
@@ -81,12 +84,14 @@ class IdentityListAPIView(ListAPIView):
     ordering_fields = ['issued_at', 'expires_at']
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Identity GetByID']))
 class IdentityDetailAPIView(RetrieveAPIView):
     """Get identity by id"""
     queryset = Identity.objects.all()
     serializer_class = IdentitySerializer
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Scan GetList']))
 class ScanListAPIView(ListAPIView):
     """Get list of scans"""
     queryset = Scan.objects.all()
@@ -95,6 +100,7 @@ class ScanListAPIView(ListAPIView):
     ordering_fields = ['id', 'identity_id']
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Scan GetByID']))
 class ScanDetailAPIView(RetrieveAPIView):
     """Get scan by id"""
     queryset = Scan.objects.all()
@@ -111,4 +117,3 @@ class IdentityListRangeAPIView(RangeMixin, IdentityListAPIView):
     """Get list of identities by range"""
     pagination_class = RangePagination
     filter_backends = [RangeFilterBackend, ]
-
