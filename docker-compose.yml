@@ -1,13 +1,22 @@
 version: '3.8'
 
 services:
-  web:
+  frontend:
+    build: ./frontend
+    command: npm start
+    volumes:
+      - ./frontend/:/usr/src/frontend/
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+  backend:
     build: ./backend
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8081"
     volumes:
       - ./backend/:/usr/src/backend/
     ports:
-      - "8000:8000"
+      - "8081:8081"
     env_file:
       - ./.env.dev
     depends_on:
