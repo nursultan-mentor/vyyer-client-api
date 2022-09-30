@@ -24,3 +24,4 @@ frontend/build
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+/backend/scan_identity/audience.py

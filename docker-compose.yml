@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis
+    restart: always
+    depends_on:
+      - backend
+  worker:
+    restart: always
+    build:
+      context: ./backend
+    env_file:
+      - ./.env.dev
+    command: [ "celery", "-A", "client_api", "worker", "-l", "info" ]
+    depends_on:
+      - redis
+      - backend
   frontend:
     build: ./frontend
     command: npm start

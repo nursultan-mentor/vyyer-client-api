@@ -3,9 +3,9 @@ from rest_framework import status
 from rest_framework.response import Response
 
 
-class RangeMixin:
+class RangeMixin:                                       # Mixin to handle range
     @staticmethod
-    def queryset_limit_offset(queryset, request):
+    def queryset_limit_offset(queryset, request):       # method to filter queryset by range
         start = request.query_params.get('from', None)
         end = request.query_params.get('to', None)
         if start and end:
@@ -14,7 +14,7 @@ class RangeMixin:
         else:
             raise ValueError('Missing "from" and "to" query parameters')
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):           # method to handle GET request
         """
             from -- ID from which to start the query
             to -- ID at which to end the query

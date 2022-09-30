@@ -10,5 +10,5 @@ urlpatterns = [
     path('scan/range/', views.ScanListRangeAPIView.as_view(), name='scan-list-range'),
     path('identity/range/', views.IdentityListRangeAPIView.as_view(), name='identity-list-range'),
 
-    path('generate_data/', views.generate_data, name='generate_data'),
+    path('generate_data/', views.GenerateData.as_view(), name='generate_data'),
 ]
