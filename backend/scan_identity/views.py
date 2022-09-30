@@ -1,15 +1,16 @@
-from asgiref.sync import sync_to_async
-from django.http import HttpResponse
-from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.response import Response
-import aiohttp
-import json
 import asyncio
-from aiohttp import web
 from itertools import chain
 
+import aiohttp
+from asgiref.sync import sync_to_async
+from django.http import HttpResponse
+from rest_framework.filters import OrderingFilter
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+
+from .filters import RangeFilterBackend
+from .mixins import RangeMixin
 from .models import Identity, Scan
+from .paginations import RangePagination
 from .serializers import IdentitySerializer, ScanSerializer
 
 
@@ -73,42 +74,41 @@ async def generate_data(request):
 
 
 class IdentityListAPIView(ListAPIView):
+    """Get list of identities"""
     queryset = Identity.objects.all()
     serializer_class = IdentitySerializer
+    filter_backends = [OrderingFilter, ]
+    ordering_fields = ['issued_at', 'expires_at']
 
 
 class IdentityDetailAPIView(RetrieveAPIView):
+    """Get identity by id"""
     queryset = Identity.objects.all()
     serializer_class = IdentitySerializer
 
 
 class ScanListAPIView(ListAPIView):
+    """Get list of scans"""
     queryset = Scan.objects.all()
     serializer_class = ScanSerializer
+    filter_backends = [OrderingFilter, ]
+    ordering_fields = ['id', 'identity_id']
 
 
 class ScanDetailAPIView(RetrieveAPIView):
+    """Get scan by id"""
     queryset = Scan.objects.all()
     serializer_class = ScanSerializer
 
 
-def queryset_limit_offset(queryset, request):
-    start = request.query_params.get('from', None)
-    end = request.query_params.get('to', None)
-    if start and end:
-        queryset = queryset.filter(id__range=[start, end])
-        return queryset
-    else:
-        raise ValueError('Missing "from" and "to" query parameters')
+class ScanListRangeAPIView(RangeMixin, ScanListAPIView):
+    """Get list of scans by range"""
+    pagination_class = RangePagination
+    filter_backends = [RangeFilterBackend, ]
 
 
-class ScanListRangeAPIView(ScanListAPIView):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset_limit_offset(queryset, self.request)
+class IdentityListRangeAPIView(RangeMixin, IdentityListAPIView):
+    """Get list of identities by range"""
+    pagination_class = RangePagination
+    filter_backends = [RangeFilterBackend, ]
 
-
-class IdentityListRangeAPIView(IdentityListAPIView):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset_limit_offset(queryset, self.request)
