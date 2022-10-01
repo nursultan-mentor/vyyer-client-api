@@ -25,8 +25,8 @@ class Scan(models.Model):
     flags = models.SmallIntegerField()
     verdict_type = models.SmallIntegerField()
     verdict_result = models.SmallIntegerField()
-    verdict_name = models.CharField(max_length=10)
-    verdict_value = models.CharField(max_length=10)
+    verdict_name = models.CharField(max_length=20)
+    verdict_value = models.CharField(max_length=20)
 
     class Meta:
         db_table = 'scans'
