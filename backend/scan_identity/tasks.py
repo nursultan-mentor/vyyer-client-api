@@ -1,5 +1,6 @@
 import asyncio
 from itertools import chain
+import json
 
 import aiohttp
 from asgiref.sync import sync_to_async
@@ -40,7 +41,7 @@ async def get_auth_token():
 async def get_scan_data(headers, session):
     scan_url = '/api/v2/scans/get/'
     # store tasks to get all scans in a list per 20 scans per request
-    tasks = (get_data(session, headers, dict(Page=c, PerPage=20), scan_url) for c in range(1, 3))
+    tasks = (get_data(session, headers, dict(Page=c, PerPage=20), scan_url) for c in range(1, 3170))
     result = await asyncio.gather(*tasks)
 
     # store all scan results in a tuple
@@ -100,8 +101,8 @@ async def generate_data():
         await sync_to_async(delete_data)()
 
         # Save all data to database
-        await Identity.objects.abulk_create(identity_bulk_create)
-        await Scan.objects.abulk_create(scan_bulk_create)
+        await Identity.objects.abulk_create(identity_bulk_create, ignore_conflicts=True)
+        await Scan.objects.abulk_create(scan_bulk_create, ignore_conflicts=True)
 
 
 @shared_task()

@@ -18,5 +18,5 @@ tzdata==2022.4
 yarl==1.8.1
 django-filter
 drf-yasg
-Celery
-Redis
+celery==5.2.7
+Redis==4.3.4
