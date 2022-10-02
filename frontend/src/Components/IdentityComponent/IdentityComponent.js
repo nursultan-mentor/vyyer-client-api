@@ -10,7 +10,7 @@ const IdentityComponent = (identity_id) => {
     const [identity, setIdentity] = useState({});
 
     const fetchIdentity = (identity_id) => {
-        axios.get("http://127.0.0.1:8081/api/identity/getById/" + identity_id["identity_id"])
+        axios.get("http://127.0.0.1:8081/api/identity/" + identity_id["identity_id"])
         .then(res => {
             setIdentity(res.data);
         })
